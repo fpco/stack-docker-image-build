@@ -1,0 +1,4 @@
+resolver: lts-7.11
+
+extra-deps:
+- typed-process-0.1.0.0
