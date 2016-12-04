@@ -5,6 +5,7 @@ import System.Process.Typed
 import System.FilePath
 import Data.Foldable
 import System.Directory
+import System.Environment (getArgs)
 import Control.Exception
 import Control.Monad
 import qualified Data.Text as T
@@ -47,12 +48,13 @@ getBinDir typ = do
 
 main :: IO ()
 main = do
+    args <- getArgs
     deps <- getExtraDeps
     putStrLn "Building extra-deps"
-    runStack $ "build" : deps
+    runStack $ "build" : deps ++ args
 
     putStrLn "Performing build local"
-    runStack ["build"]
+    runStack $ "build" : args
 
     globaldb <- getDBDir "global"
     forM_ (words "snapshot local") $ \typ -> do
