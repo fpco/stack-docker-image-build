@@ -1,5 +1,5 @@
 name:                stack-docker-image-build
-version:             0.1.0.0
+version:             0.1.2.0
 synopsis:            Generate Docker images containing additional packages
 homepage:            https://github.com/fpco/stack-docker-image-build#readme
 license:             MIT
