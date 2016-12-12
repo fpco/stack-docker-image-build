@@ -12,9 +12,8 @@ This tool recognizes some additional settings in the `stack.yaml` file:
 ```yaml
 x-stack-docker-image-build:
   build-first:
-  - alex
-  - happy
-  - gtk2hs-buildtools
+  - alex happy # build both at once
+  - gtk2hs-buildtools # then build gtk2hs-buildtools
 ```
 
 Indicate that some packages should be built before others, useful for

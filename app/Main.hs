@@ -59,7 +59,7 @@ main = do
 
     forM_ buildFirst $ \pkg -> do
         putStrLn $ "Building " ++ pkg ++ " from build-first"
-        runStack $ "build" : pkg : args
+        runStack $ "build" : words pkg ++ args
 
     unless (null deps) $ do
         putStrLn "Building extra-deps"
