@@ -16,13 +16,19 @@ import qualified Data.HashMap.Strict as HashMap
 import qualified Data.Vector as V
 import Data.Maybe
 
-getExtraDeps :: IO [String]
-getExtraDeps = do
+parseStackYaml :: IO ([String], [String])
+parseStackYaml = do
     val <- decodeFileEither "stack.yaml" >>= either throwIO return
-    return $ fromMaybe [] $ do
-        Object o <- Just val
-        Array vals <- HashMap.lookup "extra-deps" o
-        Just [T.unpack dep | String dep <- V.toList vals]
+    let buildFirst = fromMaybe [] $ do
+            Object o1 <- Just val
+            Object o2 <- HashMap.lookup "x-stack-docker-image-build" o1
+            Array vals <- HashMap.lookup "build-first" o2
+            Just [T.unpack dep | String dep <- V.toList vals]
+        extraDeps = fromMaybe [] $ do
+            Object o <- Just val
+            Array vals <- HashMap.lookup "extra-deps" o
+            Just [T.unpack dep | String dep <- V.toList vals]
+    return (buildFirst, extraDeps)
 
 stack :: [String] -> ProcessConfig () () ()
 stack args = proc "stack" $ ["--no-install-ghc", "--system-ghc"] ++ args
@@ -49,9 +55,15 @@ getBinDir typ = do
 main :: IO ()
 main = do
     args <- getArgs
-    deps <- getExtraDeps
-    putStrLn "Building extra-deps"
-    runStack $ "build" : deps ++ args
+    (buildFirst, deps) <- parseStackYaml
+
+    unless (null buildFirst) $ do
+        putStrLn "Building build-first"
+        runStack $ "build" : buildFirst ++ args
+
+    unless (null deps) $ do
+        putStrLn "Building extra-deps"
+        runStack $ "build" : deps ++ args
 
     putStrLn "Performing build local"
     runStack $ "build" : args
