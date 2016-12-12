@@ -57,9 +57,9 @@ main = do
     args <- getArgs
     (buildFirst, deps) <- parseStackYaml
 
-    unless (null buildFirst) $ do
-        putStrLn "Building build-first"
-        runStack $ "build" : buildFirst ++ args
+    forM_ buildFirst $ \pkg -> do
+        putStrLn $ "Building " ++ pkg ++ " from build-first"
+        runStack $ "build" : pkg : args
 
     unless (null deps) $ do
         putStrLn "Building extra-deps"
